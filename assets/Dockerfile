@@ -10,4 +10,4 @@ RUN cargo fetch
 COPY token.txt ./assets/token.txt
 COPY whitelist.txt ./assets/whitelist.txt
 
-RUN cargo build
+RUN cargo build --release
