@@ -38,9 +38,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-	println!("Loaded token: {}", TOKEN);
+	let token = &TOKEN.to_string().replace("\n", "");
 	let mut client =
-		Client::builder(&TOKEN).event_handler(Handler).await.expect("Err creating client");
+		Client::builder(token).event_handler(Handler).await.expect("Err creating client");
 
 	if let Err(why) = client.start().await {
 		println!("Client error: {:?}", why);
