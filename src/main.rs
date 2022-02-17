@@ -13,22 +13,7 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
 	async fn message(&self, ctx: Context, msg: Message) {
-		if WHITELIST.contains(&msg.channel_id.0.to_string()) {
-			if msg.content.contains(DOMAIN) {
-				match msg.crosspost(ctx).await {
-					Ok(_) => {
-						println!("Cross-posted message in {}", msg.channel_id.0);
-					}
-					Err(e) => {
-						eprintln!("Failed to cross post because: {}", e);
-					}
-				}
-			} else {
-                println!("Message does not contain the domain required");
-            }
-		} else {
-            println!("Message is not part of watched channels");
-        }
+			println!("{}", msg.content);
 	}
 
 	async fn ready(&self, _: Context, ready: Ready) {
@@ -39,8 +24,7 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
 	let token = &TOKEN.to_string().replace("\n", "");
-	let mut client =
-		Client::builder(token).event_handler(Handler).await.expect("Err creating client");
+	let mut client = Client::builder(token).event_handler(Handler).await.expect("Err creating client");
 
 	if let Err(why) = client.start().await {
 		println!("Client error: {:?}", why);
