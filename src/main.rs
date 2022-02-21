@@ -4,12 +4,14 @@ mod commands;
 use std::str::FromStr;
 use std::sync::{Arc};
 use serenity::{Client};
+use serenity::client::bridge::gateway::ShardManager;
 use serenity::framework::StandardFramework;
+use serenity::prelude::TypeMapKey;
 use sqlx::{ConnectOptions};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
 use crate::commands::GENERAL_GROUP;
-use crate::handler::Handler;
+use crate::handler::{DB, Handler};
 
 const TOKEN: &str = include_str!("../assets/token.txt");
 
@@ -24,7 +26,6 @@ async fn main() {
 	let token = &TOKEN.to_string().replace("\n", "");
 
 	let handler = Handler {
-		db: Arc::new(Mutex::new(db))
 	};
 
 	let framework =  StandardFramework::new()
@@ -37,6 +38,11 @@ async fn main() {
 		.event_handler(handler)
 		.framework(framework)
 		.await.expect("Err creating client");
+
+	{
+		let mut data = client.data.write().await;
+		data.insert::<DB>(Arc::new(Mutex::new(db)));
+	}
 
 	if let Err(why) = client.start().await {
 		println!("Client error: {:?}", why);
