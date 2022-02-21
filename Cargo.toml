@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 serenity = { version = "^0.10.10", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
 tokio = { version = "^1.16.1", features = ["macros", "rt-multi-thread"] }
-sqlx = { version = "^0.5.10", features = ["runtime-tokio-rustls"] }
+sqlx = { version = "^0.5.10", features = ["runtime-tokio-rustls", "sqlite"] }
+dotenv = "^0.15.0"
 
 [profile.release]
 lto = true

@@ -1,11 +1,12 @@
+use std::str::FromStr;
 use serenity::{
 	async_trait,
 	model::{channel::Message, gateway::Ready},
 	prelude::*,
 };
+use sqlx::{ConnectOptions};
+use sqlx::sqlite::SqliteJournalMode;
 
-const DOMAIN: &str = "warthunder.com";
-const WHITELIST: &str = include_str!("../assets/whitelist.txt");
 const TOKEN: &str = include_str!("../assets/token.txt");
 
 struct Handler;
@@ -23,10 +24,25 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-	let token = &TOKEN.to_string().replace("\n", "");
-	let mut client = Client::builder(token).event_handler(Handler).await.expect("Err creating client");
+	dotenv::dotenv().expect("Failed to read .env file");
 
-	if let Err(why) = client.start().await {
-		println!("Client error: {:?}", why);
-	}
+	let mut db = sqlx::sqlite::SqliteConnectOptions::from_str(&std::env::var("DATABASE_URL").unwrap()).unwrap()
+		.journal_mode(SqliteJournalMode::Wal)
+		.connect().await.unwrap();
+
+	let query = sqlx::query!(
+		r#"
+		INSERT INTO messages (author, date_received)
+		VALUES (?, ?);
+	"#,
+	0_i32 ,0_i32
+	);
+
+	query.fetch_one(&mut db).await.unwrap();
+	// let token = &TOKEN.to_string().replace("\n", "");
+	// let mut client = Client::builder(token).event_handler(Handler).await.expect("Err creating client");
+	//
+	// if let Err(why) = client.start().await {
+	// 	println!("Client error: {:?}", why);
+	// }
 }
