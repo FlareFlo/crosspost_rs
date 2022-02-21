@@ -1,6 +1,6 @@
 use std::cell::UnsafeCell;
 use std::str::FromStr;
-use std::sync::MutexGuard;
+use std::sync::{Arc, MutexGuard};
 use serenity::{async_trait, Client, model::{channel::Message, gateway::Ready}};
 use serenity::prelude::{Context, EventHandler};
 use sqlx::{ConnectOptions, SqliteConnection};
@@ -10,7 +10,7 @@ use tokio::sync::Mutex;
 const TOKEN: &str = include_str!("../assets/token.txt");
 
 struct Handler {
-	db: Mutex<SqliteConnection>,
+	db: Arc<Mutex<SqliteConnection>>,
 }
 
 #[async_trait]
@@ -18,16 +18,17 @@ impl EventHandler for Handler {
 	async fn message(&self, ctx: Context, msg: Message) {
 			println!("{}", msg.content);
 
+		let mut lock = self.db.lock().await;
 
-	// 	let yes = sqlx::query(
-	// 		r#"
-	// 	INSERT INTO messages (author, date_received)
-	// 	VALUES (?, ?);
-	// "#
-	// 	).bind(1)
-	// 		.bind(2)
-	// 		.execute(self.db)
-	// 		.await.unwrap();
+		let _ = sqlx::query(
+			r#"
+		INSERT INTO messages (author, date_received)
+		VALUES (?, ?);
+	"#
+		).bind(msg.author.id.0 as i64)
+			.bind(msg.timestamp.timestamp())
+			.execute(&mut *lock)
+			.await.unwrap();
 	}
 
 	async fn ready(&self, _: Context, ready: Ready) {
@@ -46,7 +47,7 @@ async fn main() {
 	let token = &TOKEN.to_string().replace("\n", "");
 
 	let handler = Handler {
-		db: Mutex::new(db)
+		db: Arc::new(Mutex::new(db))
 	};
 	let mut client = Client::builder(token).event_handler(handler).await.expect("Err creating client");
 
