@@ -1,11 +1,11 @@
 mod handler;
 
-use std::cell::UnsafeCell;
+
 use std::str::FromStr;
-use std::sync::{Arc, MutexGuard};
-use serenity::{async_trait, Client, model::{channel::Message, gateway::Ready}};
-use serenity::prelude::{Context, EventHandler};
-use sqlx::{ConnectOptions, SqliteConnection};
+use std::sync::{Arc};
+use serenity::{Client};
+
+use sqlx::{ConnectOptions};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
 use crate::handler::Handler;

@@ -1,10 +1,10 @@
-use std::cell::UnsafeCell;
-use std::str::FromStr;
-use std::sync::{Arc, MutexGuard};
-use serenity::{async_trait, Client, model::{channel::Message, gateway::Ready}};
+
+
+use std::sync::{Arc};
+use serenity::{async_trait, model::{channel::Message, gateway::Ready}};
 use serenity::prelude::{Context, EventHandler};
-use sqlx::{ConnectOptions, SqliteConnection};
-use sqlx::sqlite::SqliteJournalMode;
+use sqlx::{SqliteConnection};
+
 use tokio::sync::Mutex;
 
 pub struct Handler {
@@ -13,7 +13,7 @@ pub struct Handler {
 
 #[async_trait]
 impl EventHandler for Handler {
-	async fn message(&self, ctx: Context, msg: Message) {
+	async fn message(&self, _ctx: Context, msg: Message) {
 		println!("{}", msg.content);
 
 		let mut lock = self.db.lock().await;
