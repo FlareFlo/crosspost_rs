@@ -216,6 +216,7 @@ name = "crosspost_rs"
 version = "0.1.0"
 dependencies = [
  "dotenv",
+ "poise",
  "serenity",
  "sqlx",
  "time",
@@ -857,6 +858,12 @@ name = "pkg-config"
 version = "0.3.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "58893f751c9b0412871a09abd62ecd2a00298c6c83befa223ef98c52aef40cbe"
+
+[[package]]
+name = "poise"
+version = "0.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af980799a938dcc09ba0dd12dcf28487789560f0de573f1545f54f776a188d1a"
 
 [[package]]
 name = "ppv-lite86"
