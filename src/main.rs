@@ -10,7 +10,7 @@ use serenity::prelude::TypeMapKey;
 use sqlx::{ConnectOptions};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
-use crate::commands::GENERAL_GROUP;
+use crate::commands::{age, explode, register};
 use crate::handler::{DB, Handler};
 
 const TOKEN: &str = include_str!("../assets/token.txt");
@@ -28,23 +28,17 @@ async fn main() {
 	let handler = Handler {
 	};
 
-	let framework =  StandardFramework::new()
-		.configure(|c| c
-			.with_whitespace(true)
-			.prefix("!")
-		).group(&GENERAL_GROUP);
-
-	let mut client = Client::builder(token)
-		.event_handler(handler)
-		.framework(framework)
-		.await.expect("Err creating client");
-
-	{
-		let mut data = client.data.write().await;
-		data.insert::<DB>(Arc::new(Mutex::new(db)));
-	}
-
-	if let Err(why) = client.start().await {
-		println!("Client error: {:?}", why);
-	}
+	poise::Framework::build()
+		.token(include_str!("../assets/token.txt"))
+		.user_data_setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(()) }))
+		.options(poise::FrameworkOptions {
+			// configure framework here
+			prefix_options: poise::PrefixFrameworkOptions {
+				prefix: Some("!".into()),
+				..Default::default()
+			},
+			commands: vec![age(), register(), explode()],
+			..Default::default()
+		})
+		.run().await.unwrap();
 }

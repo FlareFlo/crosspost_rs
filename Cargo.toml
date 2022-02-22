@@ -7,7 +7,7 @@ edition = "2021"
 serenity = { version = "^0.10.10", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "standard_framework", "framework"] }
 tokio = { version = "^1.16.1", features = ["macros", "rt-multi-thread", "sync"] }
 sqlx = { version = "^0.5.10", features = ["runtime-tokio-rustls", "sqlite"] }
-poise = { src = "https://github.com/kangalioo/poise" }
+poise = { git = "https://github.com/kangalioo/poise", branch = "master" }
 dotenv = "^0.15.0"
 time = "^0.3.7"
 
