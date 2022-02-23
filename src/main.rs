@@ -4,7 +4,7 @@ mod commands;
 use std::path::Path;
 use std::str::FromStr;
 use std::sync::{Arc};
-use poise::builtins::register_application_commands;
+use poise::builtins::{create_application_commands, register_application_commands};
 use sqlx::{ConnectOptions};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
@@ -21,23 +21,21 @@ async fn main() {
 	let env = std::env::var("DATABASE_URL").unwrap().to_owned();
 	let path = Path::new(&env);
 
-	let db = sqlx::sqlite::SqliteConnectOptions::from_str(path.to_str().unwrap()).unwrap()
-		.journal_mode(SqliteJournalMode::Wal)
-		.connect().await.unwrap();
+	let db = sqlx::sqlite::SqliteConnectOptions::from_str(path.to_str().unwrap()).unwrap().journal_mode(SqliteJournalMode::Wal).connect().await.unwrap();
 
-		poise::Framework::build()
-			.token(include_str!("../assets/token.txt"))
-			.user_data_setup(move |_ctx, _ready, _framework| Box::pin(async move {
-				register_application_commands(_ctx, true).await.unwrap();
-				Ok(())
-			}))
-			.options(poise::FrameworkOptions {
-				prefix_options: poise::PrefixFrameworkOptions {
-					prefix: Some("!".into()),
-					..Default::default()
-				},
-				commands: vec![register(), explode()],
-				..Default::default()
-			})
-			.run().await.unwrap();
+	let framework = poise::Framework::build()
+		.token(include_str!("../assets/token.txt"))
+		.user_data_setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(()) }))
+		.options(poise::FrameworkOptions {
+		prefix_options: poise::PrefixFrameworkOptions {
+			prefix: Some("!".into()),
+			..Default::default()
+		},
+		commands: vec![register(), explode()],
+		..Default::default()
+	}).build().await.unwrap();
+
+	create_application_commands(&framework.options().commands);
+
+	framework.start().await.unwrap();
 }
