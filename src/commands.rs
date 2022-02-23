@@ -1,5 +1,6 @@
 use poise::serenity_prelude as serenity;
 use poise::serenity_prelude::User;
+use poise::samples::create_application_commands;
 
 use crate::DB;
 
@@ -47,20 +48,23 @@ pub async fn age(
 }
 
 #[poise::command(slash_command)]
-pub async fn explode(
-	ctx: Context<'_>,
-	#[description = "Selected user"] user: Option<User>,
+pub async fn do_trolling(
+	ctx: Context<'_>
 ) -> Result<(), Error> {
-	panic!("SUS");
+	ctx.say(ctx.author().name.clone()).await.unwrap();
 	Ok(())
 }
 
-/// Register slash commands in this guild or globally
-///
-/// Run with no arguments to register in guild, run with argument "global" to register globally.
 #[poise::command(prefix_command, hide_in_help)]
 pub async fn register(ctx: Context<'_>, #[flag] global: bool) -> Result<(), Error> {
 	poise::builtins::register_application_commands(ctx, global).await?;
+
+	Ok(())
+}
+
+#[poise::command(prefix_command, hide_in_help)]
+pub async fn register_global(ctx: Context<'_>) -> Result<(), Error> {
+	poise::builtins::register_application_commands(ctx, true).await?;
 
 	Ok(())
 }
