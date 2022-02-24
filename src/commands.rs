@@ -68,3 +68,9 @@ pub async fn register_global(ctx: Context<'_>) -> Result<(), Error> {
 
 	Ok(())
 }
+
+#[poise::command(slash_command)]
+pub async fn test_db(ctx: Context<'_>) -> Result<(), Error> {
+	// let mut hash_map = ctx.data().db.lock().unwrap();
+	Ok(())
+}
