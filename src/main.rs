@@ -34,9 +34,8 @@ async fn main() {
 			register(), do_trolling(), register_global(), register()
 		],
 		owners: {
-			let mut set = HashSet::new();
-			set.insert(UserId::from(325704347767799808));
-			set
+			// Converts newline seperated file with UIDs to hashset and ignores CLRF
+			HashSet::from_iter(include_str!("../assets/owners.txt").replace("\r", "").split("\n").map(|x|UserId::from(u64::from_str(x).unwrap())))
 		},
 		..Default::default()
 	};
