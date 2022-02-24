@@ -1,5 +1,6 @@
 /target
 assets/token.txt
+assets/owners.txt
 assets/whitelist.txt
 db/*.db-shm
 db/*.db-wal
