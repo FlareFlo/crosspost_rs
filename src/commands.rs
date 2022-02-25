@@ -1,6 +1,8 @@
 use poise::serenity_prelude as serenity;
 use poise::serenity_prelude::User;
 use poise::samples::create_application_commands;
+use crate::Context;
+use crate::Error;
 
 use crate::DB;
 
@@ -30,10 +32,6 @@ use crate::DB;
 //
 // 	Ok(())
 // }
-
-type Data = ();
-type Error = Box<dyn std::error::Error + Send + Sync>;
-type Context<'a> = poise::Context<'a, Data, Error>;
 
 /// Display your or another user's account creation date
 #[poise::command(slash_command)]
