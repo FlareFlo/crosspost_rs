@@ -38,7 +38,7 @@ async fn main() {
 			..Default::default()
 		},
 		commands: vec![
-			register(), do_trolling(), register_global(), register(),
+			register(), do_trolling(), register_global(),
 		],
 		owners: {
 			// Converts newline seperated file with UIDs to hashset and ignores CLRF
@@ -49,18 +49,17 @@ async fn main() {
 
 	let db_conn = Mutex::new(db);
 
-	let framework = poise::Framework::build()
+	poise::Framework::build()
 		.token(include_str!("../assets/token.txt"))
+		.options(options)
 		.user_data_setup(move |_ctx, _ready, _framework| {
 			Box::pin(async move {
-				Ok(Data {
-					db: db_conn
-				})
+				Ok(
+					Data {
+						db: db_conn
+					}
+				)
 			})
 		})
-		.options(options);
-
-	let serenity = framework.build().await.unwrap();
-
-	serenity.start().await.unwrap();
+		.run().await.unwrap();
 }
