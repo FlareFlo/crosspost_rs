@@ -32,7 +32,7 @@ async fn main() {
 
 	let db = sqlx::sqlite::SqliteConnectOptions::from_str(path.to_str().unwrap()).unwrap().journal_mode(SqliteJournalMode::Wal).connect().await.unwrap();
 
-	let options = poise::FrameworkOptions {
+	let options = poise::FrameworkOptions::<Data, Box<dyn std::error::Error + Send + Sync>> {
 		prefix_options: poise::PrefixFrameworkOptions {
 			prefix: Some("!".into()),
 			..Default::default()
@@ -51,7 +51,6 @@ async fn main() {
 
 	poise::Framework::build()
 		.token(include_str!("../assets/token.txt"))
-		.options(options)
 		.user_data_setup(move |_ctx, _ready, _framework| {
 			Box::pin(async move {
 				Ok(
@@ -61,5 +60,6 @@ async fn main() {
 				)
 			})
 		})
+		.options(options)
 		.run().await.unwrap();
 }
