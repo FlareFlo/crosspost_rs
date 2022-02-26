@@ -1,10 +1,7 @@
-use poise::serenity_prelude as serenity;
-use poise::serenity_prelude::{Timestamp, User};
-use poise::samples::create_application_commands;
+use poise::serenity_prelude::{Timestamp};
 use crate::Context;
 use crate::Error;
 
-use crate::DB;
 
 #[poise::command(slash_command)]
 pub async fn enable_crosspost(ctx: Context<'_>) -> Result<(), Error> {
@@ -37,7 +34,6 @@ pub async fn register_global(ctx: Context<'_>) -> Result<(), Error> {
 }
 
 #[poise::command(slash_command)]
-#[description = "Returns the amount of time the bot took for a round trip response"]
 pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 	let time = Timestamp::now().timestamp();
 	ctx.say(format!("Pong! after {}ms", time - ctx.created_at().timestamp())).await.unwrap();

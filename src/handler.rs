@@ -1,9 +1,7 @@
 use std::sync::{Arc};
 use serenity::{async_trait, model::{channel::Message, gateway::Ready}};
-use serenity::client::bridge::gateway::ShardManager;
 use serenity::prelude::{Context, EventHandler, TypeMapKey};
 use sqlx::{SqliteConnection};
-use sqlx::migrate::Migrate;
 use tokio::sync::Mutex;
 
 pub struct Handler {
