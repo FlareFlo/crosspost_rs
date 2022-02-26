@@ -10,7 +10,7 @@ use poise::serenity_prelude::{CreateApplicationCommand, CreateApplicationCommand
 use sqlx::{ConnectOptions, SqliteConnection};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
-use crate::commands::{age, do_trolling, enable_crosspost, register, register_global};
+use crate::commands::{enable_crosspost, ping, register, register_global};
 use crate::handler::{DB, Handler};
 
 const TOKEN: &str = include_str!("../assets/token.txt");
@@ -38,7 +38,7 @@ async fn main() {
 			..Default::default()
 		},
 		commands: vec![
-			register(), do_trolling(), register_global(), enable_crosspost(),
+			register(), register_global(), enable_crosspost(), ping(),
 		],
 		owners: {
 			// Converts newline seperated file with UIDs to hashset and ignores CLRF

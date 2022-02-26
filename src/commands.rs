@@ -1,61 +1,13 @@
 use poise::serenity_prelude as serenity;
-use poise::serenity_prelude::User;
+use poise::serenity_prelude::{Timestamp, User};
 use poise::samples::create_application_commands;
 use crate::Context;
 use crate::Error;
 
 use crate::DB;
 
-// #[group]
-// #[commands(register, unregister)]
-// struct General;
-//
-// #[command]
-// async fn register(ctx: &Context, msg: &Message) -> CommandResult {
-// 	let lock = ctx.data.write().await;
-//
-// 	let lock_1 = lock.get::<DB>().unwrap();
-//
-// 	let mut db = lock_1.lock().await;
-//
-// 	let _ = sqlx::query(
-// 		r#"
-// 			INSERT OR REPLACE INTO channels (id, registered_author, reg_date)
-// 			VALUES (?, ?, ?);
-// 		"#
-// 	).bind(msg.channel_id.0 as i64)
-// 		.bind(msg.author.id.0 as i64)
-// 		.bind(msg.timestamp.timestamp())
-// 		.execute(&mut *db).await.unwrap();
-//
-// 	msg.reply_ping(ctx, format!("Added channel {} to tracked channels.", msg.channel_id.0)).await.unwrap();
-//
-// 	Ok(())
-// }
-
-/// Display your or another user's account creation date
-#[poise::command(slash_command)]
-pub async fn age(
-	ctx: Context<'_>,
-	#[description = "Selected user"] user: Option<User>,
-) -> Result<(), Error> {
-	let user = user.as_ref().unwrap_or(ctx.author());
-	ctx.say(format!("{}'s account was created at {}", user.name, user.created_at())).await?;
-
-	Ok(())
-}
-
-#[poise::command(slash_command)]
-pub async fn do_trolling(
-	ctx: Context<'_>
-) -> Result<(), Error> {
-	ctx.say(ctx.author().name.clone()).await.unwrap();
-	Ok(())
-}
-
 #[poise::command(slash_command)]
 pub async fn enable_crosspost(ctx: Context<'_>) -> Result<(), Error> {
-
 	let mut db = ctx.data().db.lock().await;
 
 	let _ = sqlx::query(
@@ -63,10 +15,7 @@ pub async fn enable_crosspost(ctx: Context<'_>) -> Result<(), Error> {
 			INSERT OR REPLACE INTO channels (id, registered_author, reg_date)
 			VALUES (?, ?, ?);
 		"#
-	).bind(ctx.channel_id().0 as i64)
-		.bind(ctx.author().id.0 as i64)
-		.bind(ctx.created_at().timestamp())
-		.execute(&mut *db).await.unwrap();
+	).bind(ctx.channel_id().0 as i64).bind(ctx.author().id.0 as i64).bind(ctx.created_at().timestamp()).execute(&mut *db).await.unwrap();
 
 	ctx.say(format!("Added channel {} to tracked channels.", ctx.channel_id().0)).await.unwrap();
 
@@ -88,7 +37,10 @@ pub async fn register_global(ctx: Context<'_>) -> Result<(), Error> {
 }
 
 #[poise::command(slash_command)]
-pub async fn test_db(ctx: Context<'_>) -> Result<(), Error> {
-	// let mut hash_map = ctx.data().db.lock().unwrap();
+#[description = "Returns the amount of time the bot took for a round trip response"]
+pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
+	let time = Timestamp::now().timestamp();
+	ctx.say(format!("Pong! after {}ms", time - ctx.created_at().timestamp())).await.unwrap();
+
 	Ok(())
 }
