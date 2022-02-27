@@ -8,7 +8,7 @@ use poise::serenity_prelude::{ UserId};
 use sqlx::{ConnectOptions, SqliteConnection};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
-use crate::commands::{disable_crosspost, enable_crosspost, ping, register, register_global};
+use crate::commands::{disable_crosspost, enable_crosspost, ping, register, register_global, status};
 use crate::handler::event_listener;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -34,7 +34,7 @@ async fn main() {
 			..poise::PrefixFrameworkOptions::default()
 		},
 		commands: vec![
-			register(), register_global(), enable_crosspost(), ping(), disable_crosspost(),
+			register(), register_global(), enable_crosspost(), ping(), disable_crosspost(), status(),
 		],
 		owners: {
 			// Converts newline seperated file with UIDs to hashset and ignores CLRF
