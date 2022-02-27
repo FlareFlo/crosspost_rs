@@ -1,41 +1,23 @@
-use std::sync::{Arc};
-use serenity::{async_trait, model::{channel::Message, gateway::Ready}};
-use serenity::prelude::{Context, EventHandler, TypeMapKey};
-use sqlx::{SqliteConnection};
-use tokio::sync::Mutex;
+use poise::serenity_prelude::Context;
+use crate::Data;
 
-pub struct Handler {
-}
+type Error = Box<dyn std::error::Error + Send + Sync>;
 
-pub struct DB;
-
-impl TypeMapKey for DB {
-	type Value = Arc<Mutex<SqliteConnection>>;
-}
-
-#[async_trait]
-impl EventHandler for Handler {
-	async fn message(&self, ctx: Context, msg: Message) {
-		if msg.content.contains("store") {
-			let lock = ctx.data.write().await;
-
-			let lock_1 = lock.get::<DB>().unwrap();
-
-			let mut db = lock_1.lock().await;
-
-			let _ = sqlx::query(
-				r#"
-		INSERT INTO messages (author, date_received)
-		VALUES (?, ?);
-		"#
-			).bind(msg.author.id.0 as i64)
-				.bind(msg.timestamp.timestamp())
-				.execute(&mut *db)
-				.await.unwrap();
+pub async fn event_listener(
+	ctx: &Context,
+	event: &poise::Event<'_>,
+	_framework: &poise::Framework<Data, Error>,
+	_user_data: &Data,
+) -> Result<(), Error> {
+	match event {
+		poise::Event::Ready { data_about_bot } => {
+			println!("{} is connected!", data_about_bot.user.name)
 		}
+		poise::Event::Message { new_message } => {
+				new_message.crosspost(ctx).await.unwrap();
+		}
+		_ => {}
 	}
 
-	async fn ready(&self, _: Context, ready: Ready) {
-		println!("{} is connected!", ready.user.name);
-	}
+	Ok(())
 }
