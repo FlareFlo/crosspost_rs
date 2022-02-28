@@ -20,7 +20,7 @@ pub async fn event_listener(
 			if user_data.db.channel_is_in_watched_channel(new_message).await {
 				new_message.crosspost(ctx).await;
 
-				user_data.db.log_msg(new_message);
+				user_data.db.messages_log_message(new_message);
 			}
 
 		}
