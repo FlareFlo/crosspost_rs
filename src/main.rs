@@ -6,9 +6,10 @@ use std::collections::{HashSet};
 use std::path::Path;
 use std::str::FromStr;
 use std::sync::Arc;
+use std::time::Duration;
 use poise::serenity_prelude::{ UserId};
-use sqlx::{ConnectOptions, SqliteConnection};
-use sqlx::sqlite::SqliteJournalMode;
+use sqlx::{ConnectOptions, SqliteConnection, SqlitePool};
+use sqlx::sqlite::{SqliteJournalMode, SqlitePoolOptions};
 use tokio::sync::Mutex;
 use crate::commands::{channel_status, disable_crosspost, enable_crosspost, ping, register, register_global};
 use crate::db::cross_db::CrossDb;
@@ -29,7 +30,6 @@ async fn main() {
 	let env = std::env::var("DATABASE_URL").unwrap().clone();
 	let path = Path::new(&env);
 
-	let db = sqlx::sqlite::SqliteConnectOptions::from_str(path.to_str().unwrap()).unwrap().journal_mode(SqliteJournalMode::Wal).connect().await.unwrap();
 
 	let options = poise::FrameworkOptions::<Data, Box<dyn std::error::Error + Send + Sync>> {
 		prefix_options: poise::PrefixFrameworkOptions {
@@ -49,7 +49,12 @@ async fn main() {
 		..poise::FrameworkOptions::default()
 	};
 
-	let db_conn = Mutex::new(db);
+	let pool = SqlitePoolOptions::new()
+		.max_lifetime(Duration::from_secs(6000))
+		.min_connections(1)
+		.max_connections(10)
+		.connect(path.to_str().unwrap())
+		.await.unwrap();
 
 	poise::Framework::build()
 		.token(include_str!("../assets/token.txt"))
@@ -57,7 +62,7 @@ async fn main() {
 			Box::pin(async move {
 				Ok(
 					Data {
-						db: CrossDb::new(db_conn)
+						db: CrossDb::new(pool)
 					}
 				)
 			})

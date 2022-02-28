@@ -12,7 +12,7 @@ impl CrossDb {
 			INSERT OR REPLACE INTO channels (id, registered_author, reg_date)
 			VALUES (?, ?, ?);
 		"#
-		).bind(id).bind(author).bind(crated).execute(&mut *self.db.lock().await).await.unwrap();
+		).bind(id).bind(author).bind(crated).execute(&self.db).await.unwrap();
 	}
 	pub async fn channel_disable_crosspost(&self, id: i64) {
 		let _ = sqlx::query(
@@ -21,7 +21,7 @@ impl CrossDb {
 			FROM channels
 			WHERE id = ?;
 		"#
-		).bind(id).execute(&mut *self.db.lock().await).await.unwrap();
+		).bind(id).execute(&self.db).await.unwrap();
 	}
 	pub async fn channel_get(&self, channel: Channel) -> Result<SqliteRow, sqlx::Error> {
 		sqlx::query(
@@ -30,7 +30,7 @@ impl CrossDb {
 			FROM channels
 			WHERE id = ?;
 		"#
-		).bind(channel.id().0 as i64).fetch_one(&mut *self.db.lock().await).await
+		).bind(channel.id().0 as i64).fetch_one(&self.db).await
 	}
 	pub async fn channel_is_in_watched_channel(&self, channel_id: &Message) -> bool {
 		let result = sqlx::query(
@@ -39,7 +39,7 @@ impl CrossDb {
 					FROM channels
 					WHERE id = ?;
 					"#
-		).bind(channel_id.channel_id.0 as i64).fetch_one(&mut *self.db.lock().await).await.unwrap();
+		).bind(channel_id.channel_id.0 as i64).fetch_one(&self.db).await.unwrap();
 
 		return match result.try_get("count") {
 			Ok(1) => {

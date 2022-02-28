@@ -11,6 +11,6 @@ impl CrossDb {
 				INSERT INTO messages (author, date_received)
 				VALUES (?, ?);
 			"#
-		).bind(new_message.author.id.0 as i64).bind(new_message.timestamp.unix_timestamp()).execute(&mut *self.db.lock().await).await.unwrap();
+		).bind(new_message.author.id.0 as i64).bind(new_message.timestamp.unix_timestamp()).execute(&self.db).await.unwrap();
 	}
 }
