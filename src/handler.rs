@@ -28,6 +28,15 @@ pub async fn event_listener(
 			match result.try_get("count") {
 				Ok(1) => {
 					new_message.crosspost(ctx).await;
+
+					let _ = sqlx::query(
+						r#"
+							INSERT INTO messages (author, date_received)
+							VALUES (?, ?);
+						"#
+					).bind(new_message.author.id.0 as i64)
+						.bind(new_message.timestamp.unix_timestamp())
+						.execute(&mut *db).await.unwrap();
 				}
 				_ => {
 				}
