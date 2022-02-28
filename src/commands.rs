@@ -79,10 +79,9 @@ pub async fn status(ctx: Context<'_>, #[description = "The target channel to sho
 			let author: i64 = result.try_get("registered_author").unwrap_or(0);
 			let stamp_of_registry: i64 = result.try_get("reg_date").unwrap_or(0);
 
-			let date_of_registry = OffsetDateTime::from_unix_timestamp(stamp_of_registry.into()).unwrap().date();
 			let author_name = UserId::from(author as u64).to_user(ctx.discord()).await.unwrap();
 
-			ctx.say(format!("This channel was registered by {author_name} on {date_of_registry}")).await.unwrap();
+			ctx.say(format!("This channel was registered by {author_name} on <t:{stamp_of_registry}>")).await.unwrap();
 
 			return Ok(());
 		}
