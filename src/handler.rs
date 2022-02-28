@@ -42,6 +42,39 @@ pub async fn event_listener(
 				}
 			}
 		}
+		poise::Event::GuildCreate { guild, is_new } => {
+			let mut db = user_data.db.lock().await;
+
+			println!("{} {:?}", guild.name, is_new);
+
+			if *is_new {
+				let _ = sqlx::query(
+					r#"
+						INSERT INTO guilds (id, join_date)
+						VALUES (? , ?);
+					"#
+				).bind(guild.id.0 as i64)
+					.bind(guild.joined_at.unix_timestamp())
+					.execute(&mut *db).await.unwrap();
+			} else {
+				let result = sqlx::query(
+					r#"
+						SELECT whitelisted
+						FROM guilds
+						WHERE id = ?
+					"#
+				).bind(guild.id.0 as i64)
+					.fetch_one(&mut *db).await.unwrap();
+
+				match result.try_get("whitelisted") {
+					Ok(0) => {
+						guild.leave(ctx).await.unwrap();
+					}
+					_ => {}
+				}
+
+			}
+		}
 		_ => {}
 	}
 
