@@ -7,15 +7,7 @@ use crate::Error;
 
 #[poise::command(slash_command)]
 pub async fn enable_crosspost(ctx: Context<'_>, #[description = "The channel that will be enabled"] channel: Channel) -> Result<(), Error> {
-	let mut db = ctx.data().db.lock().await;
-
-	let _ = sqlx::query(
-		r#"
-			INSERT OR REPLACE INTO channels (id, registered_author, reg_date)
-			VALUES (?, ?, ?);
-		"#
-	).bind(channel.id().0 as i64).bind(ctx.author().id.0 as i64).bind(ctx.created_at().timestamp()).execute(&mut *db).await.unwrap();
-
+	ctx.data().db.channel_enable_crosspost(ctx.id() as i64, ctx.author().id.0 as i64, ctx.created_at().timestamp()).await;
 	ctx.say(format!("Added channel {} to tracked channels.", channel.id().0)).await.unwrap();
 
 	Ok(())
@@ -23,15 +15,7 @@ pub async fn enable_crosspost(ctx: Context<'_>, #[description = "The channel tha
 
 #[poise::command(slash_command)]
 pub async fn disable_crosspost(ctx: Context<'_>, #[description = "The channel that will be disabled"] channel: Channel) -> Result<(), Error> {
-	let mut db = ctx.data().db.lock().await;
-
-	let _ = sqlx::query(
-		r#"
-			DELETE
-			FROM channels
-			WHERE id = ?;
-		"#
-	).bind(channel.id().0 as i64).execute(&mut *db).await.unwrap();
+	ctx.data().db.channel_disable_crosspost(ctx.channel_id().0 as i64).await;
 
 	ctx.say(format!("Removed channel {} from tracked channels.", channel.id().0)).await.unwrap();
 
@@ -62,19 +46,9 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 }
 
 #[poise::command(slash_command)]
-pub async fn status(ctx: Context<'_>, #[description = "The target channel to show the status of"] channel: Channel) -> Result<(), Error> {
-	let mut db = ctx.data().db.lock().await;
+pub async fn channel_status(ctx: Context<'_>, #[description = "The target channel to show the status of"] channel: Channel) -> Result<(), Error> {
 
-
-	let res = sqlx::query(
-		r#"
-			SELECT *
-			FROM channels
-			WHERE id = ?;
-		"#
-	).bind(channel.id().0 as i64).fetch_one(&mut *db).await;
-
-	if let Ok(result) = res {
+	if let Ok(result) = ctx.data().db.channel_get(channel).await {
 		if !result.is_empty() {
 			let author: i64 = result.try_get("registered_author").unwrap_or(0);
 			let stamp_of_registry: i64 = result.try_get("reg_date").unwrap_or(0);

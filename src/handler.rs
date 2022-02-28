@@ -1,6 +1,8 @@
 use poise::serenity_prelude::Context;
 use sqlx::{Row, Sqlite};
+use sqlx::migrate::Migrate;
 use crate::Data;
+use crate::db::cross_db::CrossDb;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
@@ -15,64 +17,22 @@ pub async fn event_listener(
 			println!("{} is connected!", data_about_bot.user.name)
 		}
 		poise::Event::Message { new_message } => {
-			let mut db = user_data.db.lock().await;
+			if user_data.db.channel_is_in_watched_channel(new_message).await {
+				new_message.crosspost(ctx).await;
 
-			let result = sqlx::query(
-				r#"
-						SELECT COUNT(*) AS count
-						FROM channels
-						WHERE id = ?;
-					"#
-			).bind(new_message.channel_id.0 as i64).fetch_one(&mut *db).await.unwrap();
-
-			match result.try_get("count") {
-				Ok(1) => {
-					new_message.crosspost(ctx).await;
-
-					let _ = sqlx::query(
-						r#"
-							INSERT INTO messages (author, date_received)
-							VALUES (?, ?);
-						"#
-					).bind(new_message.author.id.0 as i64)
-						.bind(new_message.timestamp.unix_timestamp())
-						.execute(&mut *db).await.unwrap();
-				}
-				_ => {
-				}
+				user_data.db.log_msg(new_message);
 			}
+
 		}
 		poise::Event::GuildCreate { guild, is_new } => {
-			let mut db = user_data.db.lock().await;
-
 			println!("{} {:?}", guild.name, is_new);
 
 			if *is_new {
-				let _ = sqlx::query(
-					r#"
-						INSERT INTO guilds (id, join_date)
-						VALUES (? , ?);
-					"#
-				).bind(guild.id.0 as i64)
-					.bind(guild.joined_at.unix_timestamp())
-					.execute(&mut *db).await.unwrap();
+				user_data.db.guild_add(guild).await;
 			} else {
-				let result = sqlx::query(
-					r#"
-						SELECT whitelisted
-						FROM guilds
-						WHERE id = ?
-					"#
-				).bind(guild.id.0 as i64)
-					.fetch_one(&mut *db).await.unwrap();
-
-				match result.try_get("whitelisted") {
-					Ok(0) => {
-						guild.leave(ctx).await.unwrap();
-					}
-					_ => {}
+				if !user_data.db.guild_is_whitlisted(guild).await {
+					guild.leave(ctx).await.unwrap();
 				}
-
 			}
 		}
 		_ => {}

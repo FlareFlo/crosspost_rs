@@ -1,21 +1,24 @@
 mod handler;
 mod commands;
+mod db;
 
 use std::collections::{HashSet};
 use std::path::Path;
 use std::str::FromStr;
+use std::sync::Arc;
 use poise::serenity_prelude::{ UserId};
 use sqlx::{ConnectOptions, SqliteConnection};
 use sqlx::sqlite::SqliteJournalMode;
 use tokio::sync::Mutex;
-use crate::commands::{disable_crosspost, enable_crosspost, ping, register, register_global, status};
+use crate::commands::{channel_status, disable_crosspost, enable_crosspost, ping, register, register_global};
+use crate::db::cross_db::CrossDb;
 use crate::handler::event_listener;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
 pub struct Data {
-	db: Mutex<SqliteConnection>,
+	db: CrossDb,
 }
 
 #[tokio::main]
@@ -34,7 +37,7 @@ async fn main() {
 			..poise::PrefixFrameworkOptions::default()
 		},
 		commands: vec![
-			register(), register_global(), enable_crosspost(), ping(), disable_crosspost(), status(),
+			register(), register_global(), enable_crosspost(), ping(), disable_crosspost(), channel_status(),
 		],
 		owners: {
 			// Converts newline seperated file with UIDs to hashset and ignores CLRF
@@ -54,7 +57,7 @@ async fn main() {
 			Box::pin(async move {
 				Ok(
 					Data {
-						db: db_conn
+						db: CrossDb::new(db_conn)
 					}
 				)
 			})
