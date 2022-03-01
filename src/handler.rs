@@ -1,4 +1,5 @@
-use poise::serenity_prelude::Context;
+use std::time::Duration;
+use poise::serenity_prelude::{CacheHttp, Context};
 use sqlx::{Row, Sqlite};
 use sqlx::migrate::Migrate;
 use crate::Data;
@@ -16,7 +17,19 @@ pub async fn event_listener(
 ) -> Result<(), Error> {
 	match event {
 		poise::Event::Ready { data_about_bot } => {
-			println!("{} is connected!", data_about_bot.user.name)
+			println!("{} is connected!", data_about_bot.user.name);
+			let user_data_ref = user_data.clone();
+			let ctx_ref = ctx.clone();
+			tokio::task::spawn(async move {
+				loop {
+					user_data_ref.db.guild_bump_spam_count();
+					let bad_guilds = user_data_ref.db.guild_get_bad_guilds().await;
+					for bad_guild in bad_guilds {
+						&ctx_ref.http().get_guild(bad_guild).await.unwrap().leave(&ctx_ref).await.unwrap();
+					}
+					tokio::time::sleep(Duration::from_secs(60 * 60)).await;
+				}
+			});
 		}
 		poise::Event::Message { new_message } => {
 			if user_data.db.channel_is_in_watched_channel(new_message).await {
@@ -24,7 +37,6 @@ pub async fn event_listener(
 
 				user_data.db.messages_log_message(new_message);
 			}
-
 		}
 		poise::Event::GuildCreate { guild, is_new } => {
 			println!("{} {:?}", guild.name, is_new);

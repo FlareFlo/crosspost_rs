@@ -3,6 +3,7 @@ use tokio::sync::Mutex;
 use sqlx::{Row, SqliteConnection, SqlitePool};
 use sqlx::migrate::Migrate;
 
+#[derive(Clone)]
 pub struct CrossDb {
 	pub db: SqlitePool,
 }

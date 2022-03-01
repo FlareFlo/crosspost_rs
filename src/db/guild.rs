@@ -32,7 +32,7 @@ impl CrossDb {
 			}
 		};
 	}
-	pub async fn bump_spam_count(&self) {
+	pub async fn guild_bump_spam_count(&self) {
 		const HOUR: i64 = 1000 * 60 * 60;
 		const LIMIT_PER_HOUR: i64 = 50;
 		let curr_time = OffsetDateTime::now_utc().unix_timestamp();
@@ -63,5 +63,22 @@ impl CrossDb {
 			"#
 			).bind(bad_id).execute(&self.db).await.unwrap();
 		}
+	}
+
+	pub async fn guild_get_bad_guilds(&self) -> Vec<u64> {
+		let res = sqlx::query(
+			r#"
+					SELECT id
+					FROM guilds
+					WHERE whitelisted >= 3
+				"#
+		).fetch_all(&self.db).await.unwrap();
+
+		let mut items = Vec::new();
+		for item in res {
+			let num: i64 = item.try_get("id").unwrap();
+			items.push(num as u64);
+		}
+		items
 	}
 }

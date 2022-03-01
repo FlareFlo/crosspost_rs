@@ -18,6 +18,7 @@ use crate::handler::event_listener;
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
+#[derive(Clone)]
 pub struct Data {
 	db: CrossDb,
 }
