@@ -6,6 +6,8 @@ use crate::db::cross_db::CrossDb;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
+const MAX_WARN: i32 = 3;
+
 pub async fn event_listener(
 	ctx: &Context,
 	event: &poise::Event<'_>,
@@ -30,7 +32,7 @@ pub async fn event_listener(
 			if *is_new {
 				user_data.db.guild_add(guild).await;
 			} else {
-				if !user_data.db.guild_is_whitlisted(guild).await {
+				if user_data.db.guild_get_warn_level(guild).await >= Some(MAX_WARN.into()) {
 					guild.leave(ctx).await.unwrap();
 				}
 			}
