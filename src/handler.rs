@@ -1,4 +1,3 @@
-use std::time::Duration;
 
 use poise::serenity_prelude::{CacheHttp, ChannelType, Context};
 
@@ -26,7 +25,7 @@ pub async fn event_listener(
 					for bad_guild in bad_guilds {
 						let _ = &ctx_ref.http().get_guild(bad_guild).await.unwrap().leave(&ctx_ref).await.unwrap();
 					}
-					tokio::time::sleep(Duration::from_secs(60 * 60)).await;
+					tokio::time::sleep(std::time::Duration::from_secs(60 * 60)).await;
 				}
 			});
 		}
@@ -46,8 +45,9 @@ pub async fn event_listener(
 				user_data.db.guild_add(guild).await;
 			} else {
 				if user_data.db.guild_get_warn_level(guild).await >= Some(MAX_WARN.into()) {
-					// guild.owner_id.create_dm_channel(ctx).await.unwrap().say(ctx, format!("Your server {} has been blacklisted due to exceeding the "))
-					todo!("Fix this command");
+					const RATE_URL: &str = r#"https://github.com/FlareFlo/crosspost_rs/blob/master/rate.md"#;
+					guild.owner_id.create_dm_channel(ctx).await.unwrap()
+						.say(ctx, format!("Your server \"{}\" has been blacklisted due to exceeding the rate limit. Find out more at {}", guild.name, RATE_URL)).await.unwrap();
 					guild.leave(ctx).await.unwrap();
 				}
 			}
