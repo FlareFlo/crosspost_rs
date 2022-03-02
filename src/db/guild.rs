@@ -33,7 +33,7 @@ impl CrossDb {
 	}
 	pub async fn guild_bump_spam_count(&self) {
 		const HOUR: i64 = 1000 * 60 * 60;
-		const LIMIT_PER_HOUR: i64 = 50;
+		const LIMIT_PER_HOUR: i64 = 20;
 		let curr_time = OffsetDateTime::now_utc().unix_timestamp();
 
 		let res = sqlx::query(
