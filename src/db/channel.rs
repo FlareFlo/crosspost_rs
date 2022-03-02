@@ -1,9 +1,8 @@
-use std::process::id;
 use poise::serenity_prelude::{Channel, Message};
-use sqlx::{Row, SqliteConnection};
-use poise::serenity_prelude::Context;
+use sqlx::Row;
 use sqlx::sqlite::SqliteRow;
-use crate::{CrossDb, Data};
+
+use crate::CrossDb;
 
 impl CrossDb {
 	pub async fn channel_enable_crosspost(&self, id: i64, author: i64, crated: i64) {

@@ -1,9 +1,8 @@
-use poise::serenity_prelude::{CacheHttp, Channel, Timestamp, User, UserId};
+use poise::serenity_prelude::{Channel, Timestamp, UserId};
 use sqlx::Row;
-use time::{Date, OffsetDateTime, PrimitiveDateTime};
+
 use crate::Context;
 use crate::Error;
-
 
 #[poise::command(slash_command)]
 pub async fn enable_crosspost(ctx: Context<'_>, #[description = "The channel that will be enabled"] channel: Channel) -> Result<(), Error> {
@@ -47,7 +46,6 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 
 #[poise::command(slash_command)]
 pub async fn channel_status(ctx: Context<'_>, #[description = "The target channel to show the status of"] channel: Channel) -> Result<(), Error> {
-
 	if let Ok(result) = ctx.data().db.channel_get(channel).await {
 		if !result.is_empty() {
 			let author: i64 = result.try_get("registered_author").unwrap_or(0);

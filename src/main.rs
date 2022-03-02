@@ -1,19 +1,18 @@
-mod handler;
-mod commands;
-mod db;
-
-use std::collections::{HashSet};
+use std::collections::HashSet;
 use std::path::Path;
 use std::str::FromStr;
-use std::sync::Arc;
 use std::time::Duration;
-use poise::serenity_prelude::{ UserId};
-use sqlx::{ConnectOptions, SqliteConnection, SqlitePool};
-use sqlx::sqlite::{SqliteJournalMode, SqlitePoolOptions};
-use tokio::sync::Mutex;
+
+use poise::serenity_prelude::UserId;
+use sqlx::sqlite::SqlitePoolOptions;
+
 use crate::commands::{channel_status, disable_crosspost, enable_crosspost, ping, register, register_global};
 use crate::db::cross_db::CrossDb;
 use crate::handler::event_listener;
+
+mod handler;
+mod commands;
+mod db;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;

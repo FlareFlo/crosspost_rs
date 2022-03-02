@@ -1,8 +1,7 @@
-use std::process::id;
-use poise::serenity_prelude::{Guild, Message};
+use poise::serenity_prelude::Guild;
 use sqlx::Row;
-use sqlx::SqliteConnection;
 use time::OffsetDateTime;
+
 use crate::CrossDb;
 
 impl CrossDb {

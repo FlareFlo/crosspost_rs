@@ -1,8 +1,6 @@
 use poise::serenity_prelude::Message;
-use sqlx::Row;
-use sqlx::SqliteConnection;
-use crate::CrossDb;
 
+use crate::CrossDb;
 
 impl CrossDb {
 	pub async fn messages_log_message(&self, new_message: &Message) {
