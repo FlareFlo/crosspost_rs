@@ -46,6 +46,8 @@ pub async fn event_listener(
 				user_data.db.guild_add(guild).await;
 			} else {
 				if user_data.db.guild_get_warn_level(guild).await >= Some(MAX_WARN.into()) {
+					// guild.owner_id.create_dm_channel(ctx).await.unwrap().say(ctx, format!("Your server {} has been blacklisted due to exceeding the "))
+					todo!("Fix this command");
 					guild.leave(ctx).await.unwrap();
 				}
 			}
