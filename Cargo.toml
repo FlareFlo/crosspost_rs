@@ -2,6 +2,7 @@
 name = "crosspost_rs"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.60.0"
 
 [dependencies]
 serenity = { version = "^0.10.10", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "standard_framework", "framework"] }
