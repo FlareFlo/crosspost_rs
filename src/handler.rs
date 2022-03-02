@@ -35,9 +35,9 @@ pub async fn event_listener(
 		poise::Event::Message { new_message } => {
 			if	new_message.channel(ctx).await.unwrap().category().unwrap().kind == ChannelType::News {
 				if user_data.db.channel_is_in_watched_channel(new_message).await {
-					new_message.crosspost(ctx).await;
+					let _ = new_message.crosspost(ctx).await;
 
-					user_data.db.messages_log_message(new_message);
+					user_data.db.messages_log_message(new_message).await;
 				}
 			}
 		}
