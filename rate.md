@@ -10,5 +10,5 @@ If you were warned, try to consider reducing the amount of messages put through 
 
 ## I have been blacklisted, what now?
 
-You can appeal <a href="mailto:discord@flareflo.dev?subject=Blacklist%20appeal%20?body=%3Cserver-id%3E">here</a> (must include server-id).
+You can appeal <a href="mailto:discord@flareflo.dev?subject=Blacklist%20appeal%20;body=%3Cserver-id%3E">here</a> (must include server-id).
 Unless you were deliberately attempting to spam/sabotage, getting removed from the blacklist should be no problem.
