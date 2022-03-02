@@ -1,5 +1,6 @@
+use std::any::Any;
 use std::time::Duration;
-use poise::serenity_prelude::{CacheHttp, Context};
+use poise::serenity_prelude::{CacheHttp, ChannelType, Context};
 use sqlx::{Row, Sqlite};
 use sqlx::migrate::Migrate;
 use crate::Data;
@@ -32,10 +33,12 @@ pub async fn event_listener(
 			});
 		}
 		poise::Event::Message { new_message } => {
-			if user_data.db.channel_is_in_watched_channel(new_message).await {
-				new_message.crosspost(ctx).await;
+			if	new_message.channel(ctx).await.unwrap().category().unwrap().kind == ChannelType::News {
+				if user_data.db.channel_is_in_watched_channel(new_message).await {
+					new_message.crosspost(ctx).await;
 
-				user_data.db.messages_log_message(new_message);
+					user_data.db.messages_log_message(new_message);
+				}
 			}
 		}
 		poise::Event::GuildCreate { guild, is_new } => {
