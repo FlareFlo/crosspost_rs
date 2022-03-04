@@ -8,7 +8,7 @@ impl CrossDb {
 	pub async fn guild_add(&self, guild: &Guild) {
 		let _ = sqlx::query(
 			r#"
-					INSERT INTO guilds (id, join_date)
+					REPLACE INTO guilds (id, join_date)
 					VALUES (? , ?);
 				"#
 		).bind(guild.id.0 as i64).bind(guild.joined_at.unix_timestamp()).execute(&self.db).await.unwrap();
