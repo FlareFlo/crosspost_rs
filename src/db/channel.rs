@@ -5,13 +5,17 @@ use sqlx::sqlite::SqliteRow;
 use crate::CrossDb;
 
 impl CrossDb {
-	pub async fn channel_enable_crosspost(&self, id: i64, author: i64, crated: i64) {
+	pub async fn channel_enable_crosspost(&self, id: i64, author: i64, created: i64, guild_id: i64) {
 		let _ = sqlx::query(
 			r#"
-			INSERT OR REPLACE INTO channels (id, registered_author, reg_date)
-			VALUES (?, ?, ?);
+			INSERT OR REPLACE INTO channels (id, registered_author, reg_date, guild_id)
+			VALUES (?, ?, ?, ?);
 		"#
-		).bind(id).bind(author).bind(crated).execute(&self.db).await.unwrap();
+		).bind(id)
+			.bind(author)
+			.bind(created)
+			.bind(guild_id)
+			.execute(&self.db).await.unwrap();
 	}
 	pub async fn channel_disable_crosspost(&self, id: i64) {
 		let _ = sqlx::query(

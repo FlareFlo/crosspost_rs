@@ -6,8 +6,13 @@ use crate::Error;
 
 #[poise::command(slash_command)]
 pub async fn enable_crosspost(ctx: Context<'_>, #[description = "The channel that will be enabled"] channel: Channel) -> Result<(), Error> {
-	ctx.data().db.channel_enable_crosspost(ctx.id() as i64, ctx.author().id.0 as i64, ctx.created_at().timestamp()).await;
-	ctx.say(format!("Added channel {} to tracked channels.", channel.id().0)).await.unwrap();
+	ctx.data().db.channel_enable_crosspost(
+		channel.id().0 as i64,
+		ctx.author().id.0 as i64,
+		ctx.created_at().timestamp(),
+		channel.clone().guild().unwrap().guild_id.0 as i64
+	).await;
+	ctx.say(format!("Added channel {} to tracked channels.", channel)).await.unwrap();
 
 	Ok(())
 }
@@ -16,7 +21,7 @@ pub async fn enable_crosspost(ctx: Context<'_>, #[description = "The channel tha
 pub async fn disable_crosspost(ctx: Context<'_>, #[description = "The channel that will be disabled"] channel: Channel) -> Result<(), Error> {
 	ctx.data().db.channel_disable_crosspost(ctx.channel_id().0 as i64).await;
 
-	ctx.say(format!("Removed channel {} from tracked channels.", channel.id().0)).await.unwrap();
+	ctx.say(format!("Removed channel {} from tracked channels.", channel)).await.unwrap();
 
 	Ok(())
 }
