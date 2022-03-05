@@ -16,10 +16,10 @@ impl CrossDb {
 	pub async fn guild_get_warn_level(&self, guild: &Guild) -> Option<i64> {
 		let result = sqlx::query(
 			r#"
-						SELECT whitelisted
-						FROM guilds
-						WHERE id = ?
-					"#
+					SELECT whitelisted
+					FROM guilds
+					WHERE id = ?
+				"#
 		).bind(guild.id.0 as i64).fetch_one(&self.db).await.unwrap();
 
 		return match result.try_get("whitelisted") {
