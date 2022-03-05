@@ -29,12 +29,15 @@ pub async fn event_listener(
 			});
 		}
 		poise::Event::Message { new_message } => {
-			if let Some(ok) = new_message.channel(ctx).await.unwrap().category() {
-				if ok.kind == ChannelType::News {
+			if let Ok(ok) = new_message.channel(ctx).await {
+				if ok.guild().unwrap().kind == ChannelType::News {
 					if user_data.db.channel_is_in_watched_channel(new_message).await {
-						let _ = new_message.crosspost(ctx).await;
-
-						user_data.db.messages_log_message(new_message).await;
+						match new_message.crosspost(ctx).await {
+							Ok(_) => {
+								user_data.db.messages_log_message(new_message).await;
+							}
+							_ => {}
+						}
 					}
 				}
 			}
