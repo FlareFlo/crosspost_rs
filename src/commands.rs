@@ -1,8 +1,12 @@
-use poise::serenity_prelude::{Channel, Timestamp, UserId};
+use poise::ReplyHandle;
+use poise::serenity_prelude::{CacheHttp, Channel, Color, Timestamp, UserId};
 use sqlx::Row;
+use sysinfo::{ProcessorExt, ProcessRefreshKind, RefreshKind, SystemExt};
 
 use crate::Context;
 use crate::Error;
+use crate::info::HOSTNAME;
+use crate::info::OS;
 
 #[poise::command(slash_command)]
 pub async fn enable_crosspost(ctx: Context<'_>, #[description = "The channel that will be enabled"] channel: Channel) -> Result<(), Error> {
@@ -64,6 +68,24 @@ pub async fn channel_status(ctx: Context<'_>, #[description = "The target channe
 		}
 	}
 	ctx.say("This channel is not registered").await.unwrap();
+
+	Ok(())
+}
+
+#[poise::command(slash_command)]
+pub async fn diagnose(ctx: Context<'_>) -> Result<(), Error> {
+	let sys = ctx.data().sys.write().await.get_sysinfo();
+	ctx.send(|b|{
+		b.embed(|e|{
+			e.description("The current status of the bot").color(Color::from_rgb(199, 10, 75))
+				.field("Online since", format!("<t:{}:R>", ctx.data().start_date), false)
+		}).embed(|e|{
+			e.description(format!("About: \"{}\"", HOSTNAME.to_owned())).color(Color::from_rgb(199, 10, 75))
+				.field("CPU usage", format!("{:.1}%", sys.cpu_usage), false)
+				.field("Free memory", format!("{:?} mb", sys.avail_mem), false)
+				.field("OS", OS.to_owned(), false)
+		})
+	}).await.unwrap();
 
 	Ok(())
 }

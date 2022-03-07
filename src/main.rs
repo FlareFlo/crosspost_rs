@@ -1,18 +1,23 @@
 use std::collections::HashSet;
 use std::path::Path;
 use std::str::FromStr;
+use std::sync::Arc;
 use std::time::Duration;
 
 use poise::serenity_prelude::UserId;
 use sqlx::sqlite::SqlitePoolOptions;
+use time::{OffsetDateTime, UtcOffset};
+use tokio::sync::RwLock;
 
-use crate::commands::{channel_status, disable_crosspost, enable_crosspost, ping, register, register_global};
+use crate::commands::{channel_status, diagnose, disable_crosspost, enable_crosspost, ping, register, register_global};
 use crate::db::cross_db::CrossDb;
 use crate::handler::event_listener;
+use crate::info::Sys;
 
 mod handler;
 mod commands;
 mod db;
+mod info;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
@@ -20,6 +25,8 @@ type Context<'a> = poise::Context<'a, Data, Error>;
 #[derive(Clone)]
 pub struct Data {
 	db: CrossDb,
+	start_date: i64,
+	sys: Arc<RwLock<Sys>>,
 }
 
 #[tokio::main]
@@ -37,7 +44,7 @@ async fn main() {
 			..poise::PrefixFrameworkOptions::default()
 		},
 		commands: vec![
-			register(), register_global(), enable_crosspost(), ping(), disable_crosspost(), channel_status(),
+			register(), register_global(), enable_crosspost(), ping(), disable_crosspost(), channel_status(), diagnose(),
 		],
 		owners: {
 			// Converts newline seperated file with UIDs to hashset and ignores CLRF
@@ -62,7 +69,9 @@ async fn main() {
 			Box::pin(async move {
 				Ok(
 					Data {
-						db: CrossDb::new(pool)
+						db: CrossDb::new(pool),
+						start_date: OffsetDateTime::now_utc().unix_timestamp(),
+						sys: Arc::new(RwLock::new(Sys::new()))
 					}
 				)
 			})
