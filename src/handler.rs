@@ -1,4 +1,4 @@
-use poise::serenity_prelude::{CacheHttp, ChannelType, Context};
+use poise::serenity_prelude::{Activity, ActivityAssets, CacheHttp, ChannelType, Context, OnlineStatus};
 
 use crate::Data;
 
@@ -15,6 +15,9 @@ pub async fn event_listener(
 	match event {
 		poise::Event::Ready { data_about_bot } => {
 			println!("{} is connected!", data_about_bot.user.name);
+
+			ctx.set_presence(Some(Activity::watching("for messages to crosspost")), OnlineStatus::Online).await;
+
 			let user_data_ref = user_data.clone();
 			let ctx_ref = ctx.clone();
 			tokio::task::spawn(async move {
