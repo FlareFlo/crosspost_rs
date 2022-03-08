@@ -19,7 +19,12 @@ lazy_static! {
 	pub static ref OS: String = {
 		let sys = System::new_with_specifics(*SPECIFICS);
 
-		sys.os_version().unwrap_or("ERR: no OS ver".to_owned())
+		sys.long_os_version().unwrap_or("ERR: no OS ver".to_owned())
+	};
+	pub static ref KERNEL: String = {
+		let sys = System::new_with_specifics(*SPECIFICS);
+
+		sys.kernel_version().unwrap_or("ERR: no kernel ver".to_owned())
 	};
 }
 
