@@ -43,8 +43,6 @@ pub async fn event_listener(
 			}
 		}
 		poise::Event::GuildCreate { guild, is_new } => {
-			println!("{} {:?}", guild.name, is_new);
-
 			if user_data.db.guild_get_warn_level(guild).await >= Some(MAX_WARN.into()) {
 				const RATE_URL: &str = r#"https://github.com/FlareFlo/crosspost_rs/blob/master/rate.md"#;
 				guild.owner_id.create_dm_channel(ctx).await.unwrap().say(ctx, format!("Your server \"{}\" has been blacklisted due to exceeding the rate limit. Find out more at {}", guild.name, RATE_URL)).await.unwrap();
