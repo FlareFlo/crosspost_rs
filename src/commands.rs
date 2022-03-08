@@ -79,6 +79,7 @@ pub async fn diagnose(ctx: Context<'_>) -> Result<(), Error> {
 		b.embed(|e|{
 			e.description("The current status of the bot").color(Color::from_rgb(199, 10, 75))
 				.field("Online since", format!("<t:{}:R>", ctx.data().start_date), false)
+				.field("Shard id", format!("{}", ctx.discord().shard_id), false)
 		}).embed(|e|{
 			e.description("About the host-system").color(Color::from_rgb(199, 10, 75))
 				.field("Name", format!("\"{}\"", HOSTNAME.to_owned()), false)
