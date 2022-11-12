@@ -37,14 +37,14 @@ pub async fn register(ctx: Context<'_>, #[flag] global: bool) -> Result<(), Erro
 	Ok(())
 }
 
-#[poise::command(prefix_command, hide_in_help)]
+#[poise::command(prefix_command, slash_command, hide_in_help)]
 pub async fn register_global(ctx: Context<'_>) -> Result<(), Error> {
 	poise::builtins::register_application_commands(ctx, true).await?;
 
 	Ok(())
 }
 
-#[poise::command(slash_command)]
+#[poise::command(slash_command, prefix_command)]
 /// Total time from invoking the command to this message arriving
 pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 	let time = Timestamp::now().timestamp();
