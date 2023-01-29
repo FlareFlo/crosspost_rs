@@ -1,4 +1,4 @@
-FROM archlinux
+FROM archlinux:latest
 RUN pacman -Syu --noconfirm git base-devel rust
 RUN git clone https://github.com/FlareFlo/crosspost_rs.git
 WORKDIR ./crosspost_rs
