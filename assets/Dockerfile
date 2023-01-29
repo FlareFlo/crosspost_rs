@@ -15,4 +15,4 @@ RUN rm -rf target
 RUN pacman --noconfirm -Rns rust
 RUN pacman --noconfirm -Scc
 
-RUN ./crosspost_rs
+CMD ./crosspost_rs
