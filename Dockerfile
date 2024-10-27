@@ -11,7 +11,7 @@ RUN cargo build --release
 
 FROM alpine
 WORKDIR /running
-COPY --from=builder /build/crosspost_rs/target/x86_64-unknown-linux-musl/release/crosspost_rs .
+COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/crosspost_rs .
 
 ENV UPTIME_URL=""
 
