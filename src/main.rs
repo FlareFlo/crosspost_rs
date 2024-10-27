@@ -1,8 +1,10 @@
+use std::env;
 use serenity::{
 	async_trait,
 	model::{channel::Message, gateway::Ready},
 	prelude::*,
 };
+use uptime_kuma_pusher::UptimePusher;
 
 const DOMAIN: &str = "warthunder.com";
 const WHITELIST: &str = include_str!("../assets/whitelist.txt");
@@ -38,6 +40,7 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+	UptimePusher::new(&env::var("UPTIME_URL").unwrap()).spawn_background();
 	let token = &TOKEN.to_string().replace("\n", "");
 	let mut client =
 		Client::builder(token).event_handler(Handler).await.expect("Err creating client");

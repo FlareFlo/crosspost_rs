@@ -15,4 +15,6 @@ RUN rm -rf target
 RUN pacman --noconfirm -Rns rust
 RUN pacman --noconfirm -Scc
 
+ENV UPTIME_URL=""
+
 CMD ./crosspost_rs
