@@ -1,20 +1,18 @@
-FROM archlinux:latest
-RUN pacman -Syu --noconfirm git base-devel rust
+FROM docker.io/clux/muslrust:stable as builder
+RUN rustup install stable --profile minimal
+WORKDIR /build
 RUN git clone https://github.com/FlareFlo/crosspost_rs.git
-WORKDIR ./crosspost_rs
-
-RUN cargo fetch
+WORKDIR /build/crosspost_rs
 
 COPY token.txt ./assets/token.txt
 COPY whitelist.txt ./assets/whitelist.txt
 
 RUN cargo build --release
 
-RUN mv target/release/crosspost_rs crosspost_rs
-RUN rm -rf target
-RUN pacman --noconfirm -Rns rust
-RUN pacman --noconfirm -Scc
+FROM alpine
+WORKDIR /running
+COPY --from=builder /build/crosspost_rs/target/x86_64-unknown-linux-musl/release/crosspost_rs .
 
 ENV UPTIME_URL=""
 
-CMD ./crosspost_rs
+CMD ./crosspost_rs 1
