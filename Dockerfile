@@ -10,6 +10,7 @@ COPY ./assets/whitelist.txt ./assets/whitelist.txt
 RUN cargo build --release
 
 FROM alpine
+RUN apk add curl
 WORKDIR /running
 COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/crosspost_rs .
 
