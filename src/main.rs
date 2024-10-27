@@ -40,7 +40,7 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-	UptimePusher::new(&env::var("UPTIME_URL").unwrap()).spawn_background();
+	UptimePusher::new(&env::var("UPTIME_URL").unwrap(), false).spawn_background();
 	let token = &TOKEN.to_string().replace("\n", "");
 	let mut client =
 		Client::builder(token).event_handler(Handler).await.expect("Err creating client");
