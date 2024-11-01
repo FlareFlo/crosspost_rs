@@ -15,11 +15,11 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
 	async fn message(&self, ctx: Context, msg: Message) {
-		if WHITELIST.contains(&msg.channel_id.0.to_string()) {
+		if WHITELIST.contains(&msg.channel_id.get().to_string()) {
 			if msg.content.contains(DOMAIN) {
 				match msg.crosspost(ctx).await {
 					Ok(_) => {
-						println!("Cross-posted message in {}", msg.channel_id.0);
+						println!("Cross-posted message in {}", msg.channel_id.get());
 					}
 					Err(e) => {
 						eprintln!("Failed to cross post because: {}", e);
@@ -44,7 +44,7 @@ async fn main() {
 	println!("{}", "SPawned uptime pusher");
 	let token = &TOKEN.to_string().replace("\n", "");
 	let mut client =
-		Client::builder(token).event_handler(Handler).await.expect("Err creating client");
+		Client::builder(token, GatewayIntents::non_privileged()).event_handler(Handler).await.expect("Err creating client");
 
 	if let Err(why) = client.start().await {
 		println!("Client error: {:?}", why);
