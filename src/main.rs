@@ -38,7 +38,8 @@ impl EventHandler for Handler {
 	}
 }
 
-#[tokio::main]
+// Use current thread due to: https://github.com/mozilla/sccache/issues/1972
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
 	UptimePusher::new(&env::var("UPTIME_URL").unwrap(), false).spawn_background();
 	println!("{}", "SPawned uptime pusher");
