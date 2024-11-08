@@ -10,7 +10,7 @@ RUN cargo build --release
 
 FROM docker.io/debian:bookworm-slim
 WORKDIR /running
-COPY --from=builder /build/target/x86_64-unknown-linux/release/crosspost_rs .
+COPY --from=builder /build/target/release/crosspost_rs .
 
 ENV UPTIME_URL=""
 
