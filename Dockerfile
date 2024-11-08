@@ -1,5 +1,4 @@
-FROM docker.io/clux/muslrust:stable as builder
-RUN rustup install stable --profile minimal
+FROM rust:1-slim-bookworm as builder
 WORKDIR /build
 COPY . ./
 RUN ls
@@ -9,10 +8,9 @@ COPY ./assets/whitelist.txt ./assets/whitelist.txt
 
 RUN cargo build --release
 
-FROM alpine
-RUN apk add curl
+FROM debian:bookworm-slim
 WORKDIR /running
-COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/crosspost_rs .
+COPY --from=builder /build/target/x86_64-unknown-linux/release/crosspost_rs .
 
 ENV UPTIME_URL=""
 
