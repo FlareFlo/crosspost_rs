@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 serenity = { version = "0.12.2", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
 tokio = { version = "^1.41", features = ["macros", "rt"] }
-uptime_kuma_pusher = "0.2.0"
+uptime_kuma_pusher = "0.3.0"
 
 [profile.release]
 lto = true
