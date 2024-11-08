@@ -1,4 +1,4 @@
-FROM rust:1-slim-bookworm as builder
+FROM docker.io/rust:1-slim-bookworm as builder
 WORKDIR /build
 COPY . ./
 RUN ls
@@ -8,7 +8,7 @@ COPY ./assets/whitelist.txt ./assets/whitelist.txt
 
 RUN cargo build --release
 
-FROM debian:bookworm-slim
+FROM docker.io/debian:bookworm-slim
 WORKDIR /running
 COPY --from=builder /build/target/x86_64-unknown-linux/release/crosspost_rs .
 
